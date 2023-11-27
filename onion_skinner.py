@@ -27,12 +27,12 @@ def status(string):
 	if args.quiet == False:
 		print(string)
 
-def averageImages(imageDirs):
+def averageImages(images):
 	#load images
-	images = []
-	for image in imageDirs:
-		img = cv2.imread(args.src+"/"+image)
-		images.append(img)
+	#images = []
+	#for image in imageDirs:
+	#	img = cv2.imread(args.src+"/"+image)
+	#	images.append(img)
 	
 	#cv2.imshow("image00", images[0])
 	# List of images, all must be the same size and data type.
@@ -75,15 +75,22 @@ status("videos grouped.")
 #look for available video IDs, and loop through each
 for j in range(len(videos)):
 	video = videos[j]
+	
 	#then look for available frames of video IDs and process them
 	status(f"processing video {j+1}")
 	for i in range(len(video)):
 		frame = video[i]
 		frameImage = cv2.imread(args.src+"/"+frame)
+
+		if len(imageCache) == args.N:
+			imageCache.pop(0)
+		imageCache.append(frameImage)
+
 		#start at the first image that can load a full range of images before it
 		if i >= args.N:
 			#for each image, load N images before it
-			preceeding = video[i-args.N:i-1]
+			#preceeding = video[i-args.N:i-1]
+			preceeding = imageCache
 			averages = []
 			
 			combinedFrame = False
