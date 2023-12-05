@@ -37,9 +37,9 @@ def averageImages(images):
 	#cv2.imshow("image00", images[0])
 	# List of images, all must be the same size and data type.
 	
-	#averagedFrame = numpy.mean(images, axis=0)
-	#averagedFrame = averagedFrame.astype(numpy.uint8)
-	averagedFrame = cv2.mean()
+	averagedFrame = numpy.mean(images, axis=0)
+	averagedFrame = averagedFrame.astype(numpy.uint8)
+	#averagedFrame = cv2.mean(images)
 	return averagedFrame
 
 def split_list(alist, wanted_parts=1):
