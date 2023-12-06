@@ -8,7 +8,7 @@ instructions.
 #│	├── videos
 #│	│	└── *video sources*
 #│	└── annotations
-#│		└── *.ndjson*
+#│		└── *export-result.ndjson*
 #└── output
 
 #PREPROCESSING
@@ -20,3 +20,19 @@ python ./onion_skinner.py \
 
 #SETTING RANDOM DATASETS ASIDE FOR VAL
 # so far, just do it manually. I'll make a shell command for it later
+VIDEO_AMOUNT=33
+RAND1=$((1 + RANDOM % VIDEO_AMOUNT))
+RAND2=$((1 + RANDOM % VIDEO_AMOUNT))
+RAND3=$((1 + RANDOM % VIDEO_AMOUNT))
+RAND4=$((1 + RANDOM % VIDEO_AMOUNT))
+RAND5=$((1 + RANDOM % VIDEO_AMOUNT))
+mv output/dataset/insects/train/images/img_*${RAND1}_* output/dataset/insects/val/images
+mv output/dataset/insects/train/labels/img_*${RAND1}_* output/dataset/insects/val/labels
+mv output/dataset/insects/train/images/img_*${RAND2}_* output/dataset/insects/val/images
+mv output/dataset/insects/train/labels/img_*${RAND2}_* output/dataset/insects/val/labels
+mv output/dataset/insects/train/images/img_*${RAND3}_* output/dataset/insects/val/images
+mv output/dataset/insects/train/labels/img_*${RAND3}_* output/dataset/insects/val/labels
+mv output/dataset/insects/train/images/img_*${RAND4}_* output/dataset/insects/val/images
+mv output/dataset/insects/train/labels/img_*${RAND4}_* output/dataset/insects/val/labels
+mv output/dataset/insects/train/images/img_*${RAND5}_* output/dataset/insects/val/images
+mv output/dataset/insects/train/labels/img_*${RAND5}_* output/dataset/insects/val/labels
