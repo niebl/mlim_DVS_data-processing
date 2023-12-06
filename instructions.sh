@@ -3,9 +3,12 @@ instructions.
 #have the following directory structure:
 #
 #exampleDir/
-#├ *script location*
+#├── *script location*
 #├── input
-#│	└── videos
+#│	├── videos
+#│	│	└── *video sources*
+#│	└── annotations
+#│		└── *.ndjson*
 #└── output
 
 #PREPROCESSING
