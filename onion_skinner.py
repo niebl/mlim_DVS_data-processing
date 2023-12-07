@@ -5,6 +5,8 @@ import argparse
 import cv2
 import numpy
 
+import multiprocessing as mp
+
 #define command line arguments
 parser = argparse.ArgumentParser(description="combine DVS frames")
 
@@ -20,8 +22,6 @@ parser.add_argument('--quiet', action="store_true",
 					help='don\'t show console outputs')
 
 args = parser.parse_args()
-
-imageCache = []
 
 def status(string):
 	if args.quiet == False:
@@ -74,12 +74,9 @@ for filename in fileList:
 
 status("videos grouped.")
 
-#look for available video IDs, and loop through each
-for j in range(len(videos)):
-	video = videos[j]
-	
-	#then look for available frames of video IDs and process them
-	status(f"processing video {j+1}")
+def meansOfVideo(video, j):
+	imageCache = []
+
 	for i in range(len(video)):
 		frame = video[i]
 		frameImage = cv2.imread(args.src+"/"+frame)
@@ -118,6 +115,21 @@ for j in range(len(videos)):
 			#else, just replace one band
 
 			cv2.imwrite(args.out+"/"+frame,combinedFrame)
+
+#spawn a new process for each video
+processes = []
+for j in range(len(videos)):
+	status(f"processing video {j+1}")
+	process = mp.Process(
+		target=meansOfVideo,
+		args=(videos[j],j,)
+		)
+	process.start()
+	processes.append(process)
+	
+for process in processes:
+	process.join()
+
 
 
 #how this could be optimized:
