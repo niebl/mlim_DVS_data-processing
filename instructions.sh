@@ -1,4 +1,4 @@
-instructions.
+#instructions.
 
 #have the following directory structure:
 #
@@ -13,13 +13,14 @@ instructions.
 
 #PREPROCESSING
 #run the following command
-python ./extract_and_crop.py --src input --out output && \
+python ./extract_and_crop.py --src input --out output
+
 python ./onion_skinner.py \
 	--src output/dataset/insects/train/images_non-prepared \
 	--out output/dataset/insects/train/images -N 200
 
 #SETTING RANDOM DATASETS ASIDE FOR VAL
-# so far, just do it manually. I'll make a shell command for it later
+# for now, quite naive code
 VIDEO_AMOUNT=33
 RAND1=$((1 + RANDOM % VIDEO_AMOUNT))
 RAND2=$((1 + RANDOM % VIDEO_AMOUNT))

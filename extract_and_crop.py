@@ -114,7 +114,10 @@ def labelbox_bb_to_yolo(dict, width, height):
 
 def convert_to_coco_format(json_data) -> [AnnotationsVideo]:
 	width, height = json_data["media_attributes"]["width"],json_data["media_attributes"]["height"]
-	frames = json_data["projects"]['clor41l0i03gi07znfo8051e3']["labels"][0]["annotations"]["frames"]
+	if len(json_data["projects"]['clor41l0i03gi07znfo8051e3']["labels"]) == 0:
+		frames = []
+	else:
+		frames = json_data["projects"]['clor41l0i03gi07znfo8051e3']["labels"][0]["annotations"]["frames"]
 	annotations = []
 	for frame in frames:
 		annotations_frame = AnnotationsVideo(adjust_string_length(frame, 6, "0"))
