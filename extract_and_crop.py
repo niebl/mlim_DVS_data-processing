@@ -123,8 +123,6 @@ def convert_to_coco_format(json_data) -> [AnnotationsVideo]:
 			a = Annotation(objects[objectKey]["name"],labelbox_bb_to_yolo(objects[objectKey]["bounding_box"],width,height))        
 			annotations_frame.add_annotation(a)
 			
-	for i in range(len(val_videos)):
-
 		annotations.append(annotations_frame)
 	return annotations
 
