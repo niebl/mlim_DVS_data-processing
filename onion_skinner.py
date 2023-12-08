@@ -16,6 +16,8 @@ parser.add_argument('--out', metavar='destination', default="./out",
                     help='Destination directory for processed image series')
 parser.add_argument('-N', metavar='temporal range', type=int, default=100,
                     help='Amount of past frames to combine into current frame')
+parser.add_argument('--proc', metavar='subprocesses', type=int, default=10,
+                    help='Amount of multiprocesses to be spawned')
 parser.add_argument('--no_split', action="store_true",
 					help='Whether or not N should be split across two bands. will increase temporal resolution')
 parser.add_argument('--quiet', action="store_true",
@@ -37,9 +39,9 @@ def averageImages(images):
 	#cv2.imshow("image00", images[0])
 	# List of images, all must be the same size and data type.
 	
-	averagedFrame = numpy.mean(images, axis=0)
-	averagedFrame = averagedFrame.astype(numpy.uint8)
-	#averagedFrame = cv2.mean(images)
+	#averagedFrame = numpy.mean(images, axis=0)
+	#averagedFrame = averagedFrame.astype(numpy.uint8)
+	averagedFrame = cv2.mean(images)
 	return averagedFrame
 
 def split_list(alist, wanted_parts=1):
@@ -87,7 +89,6 @@ def meansOfVideo(video, j):
 
 		#start at the first image that can load a full range of images before it
 		if i >= args.N:
-			status(f"frame {j+1}_{i+1}")
 			#for each image, load N images before it
 			#preceeding = video[i-args.N:i-1]
 			preceeding = imageCache
@@ -122,7 +123,7 @@ for j in range(len(videos)):
 	status(f"processing video {j+1}")
 	process = mp.Process(
 		target=meansOfVideo,
-		args=(videos[j],j,)
+		args=(videos[j],j)
 		)
 	process.start()
 	processes.append(process)
