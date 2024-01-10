@@ -19,7 +19,7 @@ parser.add_argument('-N', metavar='temporal range', type=int, default=100,
 parser.add_argument('--proc', metavar='subprocesses', type=int, default=10,
                     help='Amount of multiprocesses to be spawned')
 parser.add_argument('--no_split', action="store_true",
-					help='Whether or not N should be split across two bands. will increase temporal resolution')
+					help='Whether or not N should be split across two bands. will decrease temporal resolution')
 parser.add_argument('--quiet', action="store_true",
 					help='don\'t show console outputs')
 
@@ -36,12 +36,16 @@ def averageImages(images):
 	#	img = cv2.imread(args.src+"/"+image)
 	#	images.append(img)
 	
-	#cv2.imshow("image00", images[0])
 	# List of images, all must be the same size and data type.
 	
-	#averagedFrame = numpy.mean(images, axis=0)
-	#averagedFrame = averagedFrame.astype(numpy.uint8)
-	averagedFrame = cv2.mean(images)
+	averagedFrame = numpy.mean(images, axis=0)
+	averagedFrame = averagedFrame.astype(numpy.uint8)
+	#print(type(images))
+	for image in images:
+		if not isinstance(image, numpy.ndarray):
+			print("##############################################################")
+			print(type(image))
+	#averagedFrame = cv2.mean(images)
 	return averagedFrame
 
 def split_list(alist, wanted_parts=1):
@@ -76,12 +80,13 @@ for filename in fileList:
 
 status("videos grouped.")
 
-def meansOfVideo(video, j):
+def meansOfVideo(video, b):
 	imageCache = []
 
 	for i in range(len(video)):
 		frame = video[i]
 		frameImage = cv2.imread(args.src+"/"+frame)
+		frameImage = frameImage.astype(numpy.uint8)
 
 		if len(imageCache) == args.N:
 			imageCache.pop(0)
@@ -117,22 +122,35 @@ def meansOfVideo(video, j):
 
 			cv2.imwrite(args.out+"/"+frame,combinedFrame)
 
+def freeProcesses(processes, max_amount):
+	free = False
+	to_pop = []
+	for i in range(len(processes)):
+		process = processes[i]
+		process.join(timeout=0)
+		if not process.is_alive():
+			to_pop.append(i)
+			status(f"finished process {i+1}")
+	if len(processes) < max_amount:
+		free = True
+	
+	for i in to_pop:
+		processes.pop(i)
+
+	return free
+
 #spawn a new process for each video
 processes = []
-for j in range(len(videos)):
-	status(f"processing video {j+1}")
-	process = mp.Process(
-		target=meansOfVideo,
-		args=(videos[j],j)
-		)
-	process.start()
-	processes.append(process)
-	
-for process in processes:
-	process.join()
-
-
-
-#how this could be optimized:
-# 1: don't keep reloading the images. save them in a cache, so openCV doesn't always have to do file operations
-# 2: use a GPU process where numpy is working. perhaps palma will do that automatically
+currently_edited = 0;
+while len(videos) > 0:
+	#check if there are free processes
+	if freeProcesses(processes, args.proc):
+		video = videos.pop(0)
+		status(f"processing video {currently_edited+1}")
+		currently_edited += 1
+		process = mp.Process(
+			target=meansOfVideo,
+			args=(video, False)
+			)
+		process.start()
+		processes.append(process)
