@@ -45,6 +45,7 @@ def averageImages(images):
 		if not isinstance(image, numpy.ndarray):
 			print("##############################################################")
 			print(type(image))
+	#somehow cv2.mean throws an error.
 	#averagedFrame = cv2.mean(images)
 	return averagedFrame
 
