@@ -35,7 +35,8 @@ python ./convert_to_yolo.py --src input --out output
 
 python ./onion_skinner.py \
 	--src output/dataset/insects/train/images_non-prepared \
-	--out output/dataset/insects/train/images -N 200
+	--out output/dataset/insects/train/images -N 200 --proc 20
+	#proc is the amount of subprocesses to be spawned. lower that number if the process crashes due to insufficient RAM
 
 #val-dataset A
 mv output/dataset/insects/train/images/img_001_* output/dataset/insects/val/images
