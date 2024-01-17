@@ -16,6 +16,8 @@ parser.add_argument('--src', metavar='source', default=".",
 					help='source directory of the videos')
 parser.add_argument('--out', metavar='source', default=".",
 					help='output directory directory of the cropped image series & bounding boxes')
+parser.add_argument('--raw_dvs', action="store_true",
+					help='use this flag when you use the raw 720p DVS data. This will also resize the bounding boxes')
 
 args = parser.parse_args()
 
@@ -64,7 +66,15 @@ class BoundingBox:
 
 	def __str__(self) -> str:
 		return f"{self.x} {self.y} {self.w} {self.h}"
-	
+
+	def resize(newX,newY) -> str:
+		ratioX = newX/1920
+		ratioY = newY/1080
+		self.x = self.x/ratioX
+		self.y = self.y/ratioY
+		self.w = self.w/ratioX
+		self.h = self.h/ratioY
+		return f"{self.x} {self.y} {self.w} {self.h}"
 
 class Annotation:
 	name: str
@@ -76,6 +86,13 @@ class Annotation:
 
 	def __str__(self) -> str:
 		return "0 "+self.bounding_box.__str__()
+
+	def resize(self):
+		self.bounding_box.resize(1280,720)
+
+	def resized(self) -> str:
+		return "0 "+self.bounding_box.resize(1280, 720)
+
 class AnnotationsVideo:
 
 	frame:str
@@ -112,7 +129,7 @@ def labelbox_bb_to_yolo(dict, width, height):
 	return BoundingBox(center_x,center_y,width_bb,height_bb)
 
 
-def convert_to_coco_format(json_data) -> [AnnotationsVideo]:
+def convert_to_coco_format(json_data, resize=False) -> [AnnotationsVideo]:
 	width, height = json_data["media_attributes"]["width"],json_data["media_attributes"]["height"]
 	if len(json_data["projects"]['clor41l0i03gi07znfo8051e3']["labels"]) == 0:
 		frames = []
@@ -123,19 +140,22 @@ def convert_to_coco_format(json_data) -> [AnnotationsVideo]:
 		annotations_frame = AnnotationsVideo(adjust_string_length(frame, 6, "0"))
 		objects = frames[frame]["objects"]
 		for objectKey in objects:
-			a = Annotation(objects[objectKey]["name"],labelbox_bb_to_yolo(objects[objectKey]["bounding_box"],width,height))        
+			a = Annotation(objects[objectKey]["name"],labelbox_bb_to_yolo(objects[objectKey]["bounding_box"],width,height))
+			#if resize:
+			#	a.resize()        
 			annotations_frame.add_annotation(a)
 			
 		annotations.append(annotations_frame)
 	return annotations
 
-def extract_frames(input_file, output_directory,video_id):
+def extract_frames(input_file, output_directory,video_id, cropping = True):
 	# Create output directory if it doesn't exist
 	os.makedirs(output_directory, exist_ok=True)
 
 	# Use ffmpeg to extract frames
 	image = ffmpeg.input(input_file)
-	image = image.crop(0,0,1920,1080)
+	if cropping:
+		image = image.crop(0,0,1920,1080)
 	image.output(os.path.join(output_directory, f"img_{video_id}_%06d.png")).run()
 
 from random import sample 
@@ -154,16 +174,16 @@ def pick_n_random_items(input_list, n):
 	return picked_items, non_picked_items
 
 
-def write_data_row(data_row:dict,video_id:int,dataset_dir:str, video_base_dir:str, isTraining: bool = True):
+def write_data_row(data_row:dict,video_id:int,dataset_dir:str, video_base_dir:str, isTraining: bool = True, resize = False):
 	dir_name = "train" if isTraining else "val"
 	video_id = adjust_string_length(str(video_id),3,"0")
-	frames : [AnnotationsVideo] = convert_to_coco_format(data_row)        
+	cropping = not resize
+	frames : [AnnotationsVideo] = convert_to_coco_format(data_row, cropping)        
 	for frame in frames:
 		frame.save_to_file(f"{dataset_dir}/{dir_name}/labels/",video_id)
 	
-	
 	video_location = get_video_location(video_base_dir, data_row)
-	extract_frames(video_location,f"{dataset_dir}/{dir_name}/images_non-prepared",video_id)
+	extract_frames(video_location,f"{dataset_dir}/{dir_name}/images_non-prepared",video_id, resize)
 	
 def create_directory(directory_path):
 	# Check if the directory already exists
@@ -190,12 +210,10 @@ if __name__ == "__main__":
 	# Copy input into data.yaml
 	with open(os.path.join(dataset_dir,"data.yaml"),"w") as f:
 		f.write(
-			"""
-train: ./train/images 
+"""train: ./train/images 
 val: ./val/images
 nc: 1 
-names: ['insect']
-			"""
+names: ['insect']"""
 		)
 		
 	for dir in ["train","val"]:
@@ -209,7 +227,7 @@ names: ['insect']
 #For now, this script doesn't assign eval data. that will be done via shell script
 
 	for i in range(len(training_videos)):
-		write_data_row(data[i],(i+1),dataset_dir,video_dir)
+		write_data_row(data[i],(i+1),dataset_dir,video_dir, args.raw_dvs)
 
 	for i in range(len(val_videos)):
-		write_data_row(data[i],(i+1),dataset_dir,video_dir)
+		write_data_row(data[i],(i+1),dataset_dir,video_dir, args.raw_dvs)
