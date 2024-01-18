@@ -207,8 +207,13 @@ def process_resultRows(input_list, video_dir, dataset_dir, args):
 					video_status["frame_index"] += frame_upper
 
 def labelbox_bb_to_yolo(dict, width, height):
-	center_x = dict["left"] + (dict["width"] /2)
-	center_y = dict["top"] + (dict["height"] /2)
+	left = dict["left"]
+	top = dict["top"]
+	width_in = dict["width"]
+	height_in = int(width_in * (9/16)) #16:9 aspect ratio
+
+	center_x = left + (width_in /2)
+	center_y = top + (dict["height"] /2)
 	
 	center_x /= width
 	center_y /= height
