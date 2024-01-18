@@ -18,10 +18,15 @@ parser.add_argument('-N', metavar='temporal range', type=int, default=100,
                     help='Amount of past frames to combine into current frame')
 parser.add_argument('--proc', metavar='subprocesses', type=int, default=10,
                     help='Amount of multiprocesses to be spawned')
-parser.add_argument('--no_split', action="store_true",
-					help='Whether or not N should be split across two bands. will decrease temporal resolution')
 parser.add_argument('--quiet', action="store_true",
 					help='don\'t show console outputs')
+parser.add_argument('--no_split', action="store_true",
+					help='Whether or not N should be split across two bands. will decrease temporal resolution')
+
+
+## TO IMPLEMENT
+parser.add_argument('--interlace', action="store_true",
+					help="whether or not th")
 
 args = parser.parse_args()
 

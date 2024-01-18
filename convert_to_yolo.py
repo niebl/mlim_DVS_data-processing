@@ -284,12 +284,10 @@ if __name__ == "__main__":
 	# Copy input into data.yaml
 	with open(os.path.join(dataset_dir,"data.yaml"),"w") as f:
 		f.write(
-			"""
-train: ./train/images 
+"""train: ./train/images 
 val: ./val/images
 nc: 1 
-names: ['insect']
-			"""
+names: ['insect']"""
 		)
 
 	#this needs to be done AFTER the fact
