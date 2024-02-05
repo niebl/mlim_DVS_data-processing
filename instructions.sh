@@ -25,9 +25,12 @@
 #			 │	 ├── images_non-prepared
 #			 │	 │	 └── *raw extracted frames*
 #			 │	 └── labels
-#			 └── val
-#				 ├── images
-#			 	 └── labels
+#			 ├── val
+#			 │	 ├── images
+#			 │	 └── labels
+#			 └── test
+# 				 ├── images
+#				 └── labels
 
 #PREPROCESSING
 #run the following command
@@ -62,6 +65,14 @@ mv output/dataset/insects/train/labels/img_010_* output/dataset/insects/val/labe
 mv output/dataset/insects/train/images/img_011_* output/dataset/insects/val/images
 mv output/dataset/insects/train/labels/img_011_* output/dataset/insects/val/labels
 
+#test-dataset A
+mv output/dataset/insects/train/images/img_034_* output/dataset/insects/test/images
+mv output/dataset/insects/train/images/img_036_* output/dataset/insects/test/images
+mv output/dataset/insects/train/images/img_042_* output/dataset/insects/test/images
+mv output/dataset/insects/train/labels/img_034_* output/dataset/insects/test/labels
+mv output/dataset/insects/train/labels/img_036_* output/dataset/insects/test/labels
+mv output/dataset/insects/train/labels/img_042_* output/dataset/insects/test/labels
+
 #val-dataset B
 mv output/dataset/insects/train/images/img_012_* output/dataset/insects/val/images
 mv output/dataset/insects/train/labels/img_012_* output/dataset/insects/val/labels
@@ -88,6 +99,13 @@ mv output/dataset/insects/train/labels/img_022_* output/dataset/insects/val/labe
 mv output/dataset/insects/train/images/img_023_* output/dataset/insects/val/images
 mv output/dataset/insects/train/labels/img_023_* output/dataset/insects/val/labels
 
+#test-dataset B
+mv output/dataset/insects/train/images/img_009_* output/dataset/insects/test/images
+mv output/dataset/insects/train/images/img_010_* output/dataset/insects/test/images
+mv output/dataset/insects/train/images/img_011_* output/dataset/insects/test/images
+mv output/dataset/insects/train/labels/img_009_* output/dataset/insects/test/labels
+mv output/dataset/insects/train/labels/img_010_* output/dataset/insects/test/labels
+mv output/dataset/insects/train/labels/img_011_* output/dataset/insects/test/labels
 
 
 
